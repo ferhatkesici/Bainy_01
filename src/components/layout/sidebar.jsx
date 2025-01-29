@@ -1,13 +1,45 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Lottie from "lottie-react";
 import logoAnimation from "../../assets/data.json";
 import { useApp } from '../../contexts/AppContext';
 
-const Sidebar = ({ navItems }) => {
+const Sidebar = () => {
+  const { pathname } = useLocation();
   const { user, handleLogout } = useApp();
   const [isLogoHovered, setIsLogoHovered] = useState(false);
+
+  const navItems = [
+    { 
+      path: '/task-list', 
+      icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>,
+      title: 'İş Listesi' 
+    },
+    { 
+      path: '/new-task', 
+      icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>,
+      title: 'Yeni İş' 
+    },
+    { 
+      path: '/employee-management', 
+      icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>,
+      title: 'Çalışan Yönetimi' 
+    },
+    { 
+      path: '/scheduler', 
+      icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>,
+      title: 'Takvim' 
+    }
+  ];
 
   return (
     <motion.aside
@@ -46,10 +78,14 @@ const Sidebar = ({ navItems }) => {
           <Link
             key={item.path}
             to={item.path}
-            className="flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-white/60 hover:text-[#EF4746] transition-colors duration-200"
+            className={`flex items-center px-4 py-2 mb-2 rounded-lg transition-colors ${
+              pathname === item.path
+                ? 'bg-[#B688FF] text-white'
+                : 'text-gray-600 hover:bg-gray-100'
+            }`}
           >
             {item.icon}
-            <span className="hidden md:block">{item.title}</span>
+            <span className="ml-3">{item.title}</span>
           </Link>
         ))}
       </nav>

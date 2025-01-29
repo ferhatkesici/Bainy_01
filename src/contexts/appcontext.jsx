@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import axios from 'axios';
+import { hashPassword } from '../utils/passwordUtils';
+import { toast } from "react-hot-toast";
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 const AppContext = createContext();
@@ -39,9 +41,9 @@ const initialEmployees = [
 
 // Mock login fonksiyonunu güncelleyelim
 const mockLogin = (credentials) => {
-  // Mevcut çalışanlar listesinden kullanıcıyı bulalım
+  const hashedPassword = hashPassword(credentials.password);
   const user = initialEmployees.find(
-    emp => emp.username === credentials.username && emp.password === credentials.password
+    emp => emp.username === credentials.username && emp.hashedPassword === hashedPassword
   );
 
   if (user) {
@@ -59,38 +61,68 @@ const mockLogin = (credentials) => {
   throw new Error('Geçersiz kullanıcı adı veya şifre');
 };
 
-export function AppProvider({ children }) {
-  const [user, setUser] = useState(null);
+export const AppProvider = ({ children }) => {
+  const [employees, setEmployees] = useState([
+    {
+      id: 1,
+      username: "gamze",
+      password: "1111",
+      name: "Gamze",
+      role: "supervisor",
+      department: "Yönetim",
+      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=supervisor"
+    }
+  ]);
   const [tasks, setTasks] = useState([]);
-  const [employees, setEmployees] = useState(initialEmployees); // initialEmployees zaten tanımlı
-  const [loading, setLoading] = useState(false); // loading'i false yapıyoruz
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [selectedEmployeeFilter, setSelectedEmployeeFilter] = useState('');
+  const [user, setUser] = useState({ 
+    id: 1,
+    username: "gamze",
+    password: "1111",
+    name: "Gamze",
+    role: "supervisor",
+    department: "Yönetim",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=supervisor"
+  });
 
-  // Login işlemi - şimdilik mock data kullanıyoruz
-  const handleLogin = async (credentials) => {
-    try {
-      const response = mockLogin(credentials);
-      setUser(response.user);
-      return true;
-    } catch (err) {
-      setError('Geçersiz kullanıcı adı veya şifre');
-      console.error(err);
-      return false;
+  const login = (credentials) => {
+    setLoading(true);
+    setError(null);
+
+    const foundUser = employees.find(
+      (emp) => 
+        emp.username === credentials.username && 
+        emp.password === credentials.password
+    );
+
+    if (foundUser) {
+      setUser(foundUser);
+      setLoading(false);
+    } else {
+      setError("Geçersiz kullanıcı adı veya şifre!");
+      setLoading(false);
     }
   };
 
-  // Task işlemleri - şimdilik local state kullanıyoruz
+  const logout = () => {
+    setUser(null);
+  };
+
+  // Yeni görev ekleme fonksiyonu
   const addTask = async (newTask) => {
     try {
-      // API yerine direkt state'e ekliyoruz
-      const taskWithId = { ...newTask, id: Date.now() };
-      setTasks(prev => [...prev, taskWithId]);
+      setLoading(true);
+      // Yeni görevi tasks state'ine ekle
+      setTasks(prevTasks => [...prevTasks, newTask]);
+      toast.success("Yeni görev başarıyla eklendi!");
       return true;
-    } catch (err) {
-      setError('Görev eklenirken hata oluştu');
-      console.error(err);
+    } catch (error) {
+      toast.error("Görev eklenirken bir hata oluştu!");
       return false;
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -165,8 +197,8 @@ export function AppProvider({ children }) {
     employees,
     loading,
     error,
-    handleLogin,
-    handleLogout: () => setUser(null),
+    handleLogin: login,
+    handleLogout: logout,
     addTask,
     handleStatusChange,
     handleHoursChange,
@@ -183,7 +215,7 @@ export function AppProvider({ children }) {
       {children}
     </AppContext.Provider>
   );
-}
+};
 
 export function useApp() {
   const context = useContext(AppContext);

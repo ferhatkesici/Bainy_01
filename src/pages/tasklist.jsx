@@ -135,34 +135,30 @@ const TaskList = () => {
 
         <div className="p-6">
           <h3 className="text-xl font-semibold mb-6 text-gray-800">Devam Eden İşler</h3>
-          <AnimatePresence>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {ongoingTasks.map(task => (
-                <TaskCard 
-                  key={task.id} 
-                  task={task}
-                  onStatusChange={handleStatusChange}
-                  onHoursChange={handleHoursChange}
-                />
-              ))}
-            </div>
-          </AnimatePresence>
+          <div>
+            {ongoingTasks.map(task => (
+              <TaskCard
+                key={task.id}
+                task={task}
+                onStatusChange={handleStatusChange}
+                onHoursChange={handleHoursChange}
+              />
+            ))}
+          </div>
         </div>
 
         <div className="p-6 border-t border-gray-200">
           <h3 className="text-xl font-semibold mb-6 text-gray-800">Tamamlanan İşler</h3>
-          <AnimatePresence>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {completedTasks.map(task => (
-                <TaskCard 
-                  key={task.id} 
-                  task={task}
-                  onStatusChange={handleStatusChange}
-                  onHoursChange={handleHoursChange}
-                />
-              ))}
-            </div>
-          </AnimatePresence>
+          <div>
+            {completedTasks.map(task => (
+              <TaskCard
+                key={task.id}
+                task={task}
+                onStatusChange={handleStatusChange}
+                onHoursChange={handleHoursChange}
+              />
+            ))}
+          </div>
         </div>
       </motion.div>
     </div>

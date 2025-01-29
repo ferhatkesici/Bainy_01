@@ -2,12 +2,12 @@ import React, { useState, useRef, useMemo } from 'react';
 import { motion } from "framer-motion";
 import { useApp } from '../contexts/AppContext';
 import { useNavigate } from 'react-router-dom';
+import { toast } from "react-hot-toast";
 
-const NewTask = () => {
+function NewTask() {
   const navigate = useNavigate();
   const { employees, addTask } = useApp();
   
-  // today değişkenini useMemo ile optimize edelim
   const today = useMemo(() => new Date().toISOString().split('T')[0], []);
 
   const [formData, setFormData] = useState({
@@ -23,15 +23,31 @@ const NewTask = () => {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [filteredSuggestions, setFilteredSuggestions] = useState([]);
 
-  const handleSubmit = (e) => {
+  const handleSubmitForm = (e) => {
     e.preventDefault();
+    
+    if (!formData.name || !formData.employee) {
+      toast.error("Lütfen zorunlu alanları doldurun!");
+      return;
+    }
+    
     const newTask = {
+      id: Date.now(),
       ...formData,
-      id: Date.now().toString(),
-      creationDate: today,
+      createdAt: today,
     };
+
     addTask(newTask);
-    navigate('/task-list');
+    toast.success("Yeni iş başarıyla oluşturuldu!");
+    navigate("/task-list");
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   const handleNameChange = (e) => {
@@ -69,16 +85,17 @@ const NewTask = () => {
         className="max-w-3xl mx-auto bg-gradient-to-b from-white to-[#B688FF] rounded-2xl overflow-hidden shadow-2xl"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -20 }}
         transition={{ duration: 0.5 }}
       >
         <div className="p-6 border-b border-gray-200">
-          <h2 className="text-2xl font-bold text-gray-800">Yeni İş Ekle</h2>
+          <h2 className="text-2xl font-bold text-gray-800">Yeni İş Oluştur</h2>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6">
+        <form onSubmit={handleSubmitForm} className="p-6">
           <div className="space-y-4">
             <div className="bg-white/60 rounded-lg p-4 relative" ref={inputRef}>
-              <label className="block text-sm font-medium text-gray-700 mb-2">İş Adı</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">İş Başlığı</label>
               <input
                 type="text"
                 value={formData.name}
@@ -86,8 +103,7 @@ const NewTask = () => {
                 onKeyDown={handleKeyDown}
                 className="w-full bg-white/40 backdrop-blur-sm rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#B688FF] transition-all duration-300 appearance-none"
                 style={{ WebkitAppearance: 'none' }}
-                placeholder="İş adını yazın"
-                required
+                placeholder="İş başlığını yazın"
               />
               {showSuggestions && filteredSuggestions.length > 0 && (
                 <div className="absolute left-0 right-0 mt-1 mx-4 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg z-10 border border-gray-200">
@@ -105,39 +121,85 @@ const NewTask = () => {
             </div>
 
             <div className="bg-white/60 rounded-lg p-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Proje</label>
-              <input
-                type="text"
+              <label className="block text-sm font-medium text-gray-700 mb-2">Açıklama</label>
+              <textarea
                 value={formData.project}
-                onChange={(e) => setFormData({...formData, project: e.target.value})}
+                onChange={handleChange}
+                name="project"
+                rows="3"
                 className="w-full bg-white/40 backdrop-blur-sm rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#B688FF] transition-all duration-300"
-                required
               />
             </div>
 
             <div className="bg-white/60 rounded-lg p-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Çalışan</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Atanan Kişi</label>
               <select
                 value={formData.employee}
-                onChange={(e) => setFormData({...formData, employee: e.target.value})}
+                onChange={handleChange}
+                name="employee"
                 className="w-full bg-white/40 backdrop-blur-sm rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#B688FF] transition-all duration-300"
                 required
               >
-                <option value="">Çalışan Seçin</option>
-                {employees.map(employee => (
-                  <option key={employee.id} value={employee.name}>{employee.name}</option>
+                <option value="">Seçiniz</option>
+                {employees?.map(emp => (
+                  <option key={emp.id} value={emp.id}>{emp.name}</option>
                 ))}
               </select>
             </div>
 
-            <div className="bg-white/60 rounded-lg p-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Bitiş Tarihi</label>
-              <input
-                type="date"
-                value={formData.deadline}
-                readOnly
-                className="w-full bg-white/40 backdrop-blur-sm rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#B688FF] transition-all duration-300"
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-white/60 rounded-lg p-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Başlangıç Tarihi</label>
+                <input
+                  type="date"
+                  value={formData.deadline}
+                  onChange={handleChange}
+                  name="deadline"
+                  className="w-full bg-white/40 backdrop-blur-sm rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#B688FF] transition-all duration-300"
+                  required
+                />
+              </div>
+              
+              <div className="bg-white/60 rounded-lg p-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Bitiş Tarihi</label>
+                <input
+                  type="date"
+                  value={formData.deadline}
+                  onChange={handleChange}
+                  name="deadline"
+                  className="w-full bg-white/40 backdrop-blur-sm rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#B688FF] transition-all duration-300"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-white/60 rounded-lg p-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Durum</label>
+                <select
+                  value={formData.status}
+                  onChange={handleChange}
+                  name="status"
+                  className="w-full bg-white/40 backdrop-blur-sm rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#B688FF] transition-all duration-300"
+                >
+                  <option>Devam Ediyor</option>
+                  <option>Tamamlandı</option>
+                </select>
+              </div>
+              
+              <div className="bg-white/60 rounded-lg p-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Öncelik</label>
+                <select
+                  value={formData.hours}
+                  onChange={handleChange}
+                  name="hours"
+                  className="w-full bg-white/40 backdrop-blur-sm rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#B688FF] transition-all duration-300"
+                >
+                  <option>Düşük</option>
+                  <option>Orta</option>
+                  <option>Yüksek</option>
+                </select>
+              </div>
             </div>
           </div>
 
@@ -165,6 +227,6 @@ const NewTask = () => {
       </motion.div>
     </div>
   );
-};
+}
 
 export default NewTask;
