@@ -1,0 +1,6 @@
+@import './styles/colors.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Root değişkenlerini kaldırabiliriz çünkü colors.css'de zaten tanımlı */

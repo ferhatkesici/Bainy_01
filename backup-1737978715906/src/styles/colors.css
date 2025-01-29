@@ -1,0 +1,33 @@
+@layer base {
+  :root {
+    /* Ana Renkler - Hex değerlerini RGB'ye çevirelim performans için */
+    --color-bainy: 134, 44, 255;      /* #862CFF - Bainy Logo */
+    --color-action: 239, 71, 70;      /* #EF4746 - Butonlar ve Tıklamalar */
+    --color-card: 182, 136, 255;      /* #B688FF - Rounded Alanlar */
+    
+    /* Arka Plan Renkleri */
+    --color-bg-main: 253, 251, 245;   /* #B688FF - Ana Arka Plan */
+    --color-bg-dark: 28, 28, 28;      /* #1C1C1C - Koyu Arka Plan */
+    --color-bg-card: 51, 51, 51;      /* #333333 - Kart Arka Plan */
+
+    /* Metin Renkleri */
+    --color-text-primary: 138, 137, 124;  /* #EF4746 */
+    --color-text-secondary: 102, 102, 102; /* #666666 */
+    --color-text-white: 255, 255, 255;    /* #FFFFFF */
+
+    /* Durum Renkleri */
+    --color-success: 22, 163, 74;      /* #16A34A */
+    --color-success-hover: 21, 128, 61; /* #15803D */
+    --color-warning: 202, 138, 4;      /* #CA8A04 */
+    --color-warning-hover: 161, 98, 7; /* #A16207 */
+    --color-error: 220, 38, 38;        /* #DC2626 */
+    --color-error-hover: 185, 28, 28;  /* #B91C1C */
+
+    /* Border Renkleri */
+    --color-border: 51, 51, 51;        /* #333333 */
+    --color-border-focus: 134, 44, 255; /* #862CFF - Bainy rengi */
+
+    /* Navigation Bar Rengi */
+    --color-bg-nav: 217, 197, 255;    /* #D9C5FF */
+  }
+} 
